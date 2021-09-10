@@ -20,3 +20,6 @@ COMMANDS
 truffle compile
 truffle migrate
 truffle test
+
+!!!
+migrations/2_deploy_contracts.js to change the contract constructor parameters
