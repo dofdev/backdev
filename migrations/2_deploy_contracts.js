@@ -3,5 +3,6 @@ var Monolith = artifacts.require('Monolith')
 // weirdly enough: parameter order matters !name
 module.exports = (deployer, network, accounts) => {
   const founders = [accounts[0], accounts[1]]
-  deployer.deploy(Monolith, founders, 3)
+  const initCreditCap = 5
+  deployer.deploy(Monolith, founders, initCreditCap, { from: accounts[0], value: 1500000 * 1e12 })
 }
