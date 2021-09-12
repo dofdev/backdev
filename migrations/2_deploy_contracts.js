@@ -4,5 +4,5 @@ var Monolith = artifacts.require('Monolith')
 module.exports = (deployer, network, accounts) => {
   const founders = [accounts[0], accounts[1]]
   const initCreditCap = 5
-  deployer.deploy(Monolith, founders, initCreditCap, { from: accounts[0], value: 1500000 * 1e12 })
+  deployer.deploy(Monolith, founders, initCreditCap, { from: accounts[0] })
 }

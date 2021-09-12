@@ -1,16 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.8.7 <0.9.0;
 
-// Design Principle(s)
-  // Simple Foundational Systems that handle the bulk of the problem
-    // but leave room for the company to be adaptive
-  // Lives Beyond Yourself
-
 contract Monolith {
   mapping(address => uint) public credits;
   uint public creditCap;
 
-  constructor(address[] memory founders, uint initCreditCap) payable {
+  constructor(address[] memory founders, uint initCreditCap) {
     creditCap = initCreditCap;
     for (uint i = 0; i < founders.length; i++)
     {
@@ -18,35 +13,97 @@ contract Monolith {
     }
   }
 
-  uint256 public balanceHeld; // public or permission?
+  struct Expense {
+    string reason;
+    uint amount;
+    address[] signed;
+  }
+  mapping(address => Expense) public expenses;
 
   struct Project {
     string name;
-    uint256 price;
-    uint256 devPayIndex;
-    uint256 purchased;
+    uint minPrice;
+    uint devPayIndex;
+    uint purchased;
   }
   Project[] public projects;
-  mapping(uint256 => string[]) private hashes;
-  mapping(uint256 => address[]) private devs;
-  mapping(address => uint256[]) public collection;
+  mapping(uint => address[]) private devs;
+  mapping(uint => string[]) private hashes;
+  mapping(address => uint[]) public collection;
 
   // dev side
   function permission() internal view {
     require(credits[msg.sender] >= creditCap, "sender != a creditCap dev");
   }
 
-  function getContractBalance() public view returns (uint256) { // test
-    return payable(address(this)).balance;
+  function dropCredit() public {
+    permission(); // then only a permDev can do this
+    credits[msg.sender]--;
+  }
+
+  function removeCredit() public {
+    permission();
   }
 
   function getCredits() public view returns (uint) {
     return credits[msg.sender];
   }
-  
-  function newProject(string memory name, uint256 price, address[] memory initDevs) public {
+
+  function submitExpense(string memory reason, uint amount) public {
     permission();
-    projects.push(Project(name, price, 0, 0));
+    expenses[msg.sender].reason = reason;
+    expenses[msg.sender].amount = amount;
+    expenses[msg.sender].signed = [msg.sender];
+  }
+
+  function signExpense(address dev) public {
+    permission();
+    expenses[dev].signed.push(msg.sender);
+  }
+
+  function checkExpense() public payable returns (bool) {
+    permission();
+    
+    // new project requires consensus?
+    // that way it can be used to get the activePermDevs...
+
+    // right now we can we loop over all the projects devs
+    for (uint i = 0; i < projects.length; i++)
+    {
+      for (uint j = 0; j < devs[i].length; j++)
+      {
+        if (credits[devs[i][j]] >= creditCap)
+        {
+          bool signed = false;
+          for (uint k = 0; k < expenses[msg.sender].signed.length; k++)
+          {
+            if (expenses[msg.sender].signed[k] == devs[i][j])
+            {
+              signed = true;
+              // break;
+            }
+          }
+
+          if (!signed)
+          {
+            return false;
+          }
+        }
+      }
+    }
+
+    payable(msg.sender).transfer(expenses[msg.sender].amount);
+    return true;
+  }
+
+  function getContractBalance() public view returns (uint) { // test
+    permission();
+    return payable(address(this)).balance;
+  }
+  
+  function newProject(string memory name, uint minPrice, address[] memory initDevs) public {
+    permission();
+    projects.push(Project(name, minPrice, 0, 0));
     
     devs[projects.length - 1] = initDevs;
     for (uint i = 0; i < initDevs.length; i++)
@@ -56,51 +113,50 @@ contract Monolith {
     }
   }
 
-  function pushHash(uint256 projectIndex, string calldata hash) public {
+  function pushHash(uint projectIndex, string calldata hash) public {
     permission();
     hashes[projectIndex].push(hash);
   }
 
-  function priceChange(uint256 projectIndex, uint256 price) public {
+  function minPriceChange(uint projectIndex, uint minPrice) public {
     permission();
-    projects[projectIndex].price = price;
+    projects[projectIndex].minPrice = minPrice;
   }
 
-  function getProjectsLength() public view returns (uint256) {
+  function getProjectsLength() public view returns (uint) {
     return projects.length;
   }
 
-  function getPurchased(uint256 projectIndex) public view returns (uint256) {
+  function getPurchased(uint projectIndex) public view returns (uint) {
     return projects[projectIndex].purchased;
   }
 
-  function getCollectionLength() public view returns (uint256) {
+  function getCollectionLength() public view returns (uint) {
     return collection[msg.sender].length;
   }
 
-  function getHashesLength(uint256 projectIndex) public view returns (uint256) {
+  function getHashesLength(uint projectIndex) public view returns (uint) {
     return hashes[projectIndex].length;
   }
 
   // user side
-  function buyProject(uint256 projectIndex) public payable {
+  function buyProject(uint projectIndex) public payable {
     Project storage r = projects[projectIndex];
-    require(msg.value >= r.price, "can't pay less than min price");
+    require(msg.value >= r.minPrice, "can't pay less than min price");
 
-    
-    address dev = devs[projectIndex][r.devPayIndex]; // payable?
+    address dev = devs[projectIndex][r.devPayIndex];
     uint totalDevCredits = 0;
     for (uint i = 0; i < devs[projectIndex].length; i++)
     {
       totalDevCredits += credits[devs[projectIndex][i]];
     }
 
-    uint256 c = credits[dev];
-    uint256 t = totalDevCredits;
-    uint256 l = devs[projectIndex].length;
+    // contract takes half, rolling payouts
     // 1 - (1 - cut)^2 ? we can use builin exp == x**2
-    uint256 cut = (msg.value * ((((c * 1000) / t) * l) / 2)) / 1000;
-    payable(dev).transfer(cut);
+    uint precision = 100000;
+    uint c = (credits[dev] * precision) / totalDevCredits;
+    uint cut = (c * devs[projectIndex].length) / 2; 
+    payable(dev).transfer((msg.value * cut) / 100000);
 
     r.devPayIndex++;
     if (r.devPayIndex >= devs[projectIndex].length)
@@ -108,33 +164,17 @@ contract Monolith {
       r.devPayIndex = 0;
     }
 
-
     collection[msg.sender].push(projectIndex);
     r.purchased++;
   }
 
-  function getHash(uint256 colIndex, uint256 hashIndex)
+  function getHash(uint colIndex, uint hashIndex)
     public
     view
     returns (string memory)
   {
     string[] memory h = hashes[collection[msg.sender][colIndex]];
     return h[hashIndex];
-  }
-
-  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-    if (a == 0) {
-      return 0;
-    }
-    uint256 c = a * b;
-    require(c / a == b, "uint overflow from multiplication");
-    return c;
-  }
-
-  function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    require(b > 0, "division by zero");
-    uint256 c = a / b;
-    return c;
   }
 
   // how to handle someone going rogue? / lost or compromised account?

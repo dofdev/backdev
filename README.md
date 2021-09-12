@@ -1,7 +1,9 @@
 # backdev
 
-put off name schemes in the way of it inhibitting forward progress
-*getting a clearer idea for how to express the idea is fine
+Design Principle(s)
+  Simple Foundational Systems that handle the bulk of the problem
+    but leave room for the company to be adaptive
+  Lives Beyond You
 
 ~~setup a git~~
 ~~refactor to Monolith~~
@@ -9,17 +11,37 @@ put off name schemes in the way of it inhibitting forward progress
 ~~test buyRelease function~~
 look into fallback functions
 
-keyFeatures = [compensation, networking, allocation agreement, ]
-foreach (feature in keyFeatures) {
+newFeatures = [ networking ]
+foreach (feature in newFeatures) {
   psuedo code(feature) // data and systems
   translate to solidity syntax
   test with truffle
 }
 
-DEPRECATED?
-(bool sent, bytes memory data) = address(this).call{value: msg.value}(abi.encodeWithSignature("deposit(uint256)", msg.value));
-require(data.length > 0, "Data");
-require(sent, "Failed to send Ether");
+refactor (now that I've gone through and packed all the features in)
+
+share/test/refine/harden
+
+
+
+
+the permDevs can keep the core small by using the credit climb
+
+
+voluntary (moving on)
+  credit decrement?
+accidental (dead/lost accounts)
+  no credit
+malicious (hacked or otherwise)
+  no credit
+
+  how to undo damage? migration?
+  report?
+  freeze?
+
+
+track time:
+block.timestamp || now?
 
 
 COMMANDS
@@ -29,3 +51,5 @@ truffle test
 
 !!!
 migrations/2_deploy_contracts.js to change the contract constructor parameters
+
+uint == uint256
