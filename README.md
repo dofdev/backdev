@@ -9,8 +9,9 @@
 ~~refactor to Monolith~~  
 ~~setup truffle~~  
 ~~test buyRelease function~~  
-~~refactor (now that I've gone through and packed all the features in)~~  
-share/test/refine/harden  
+~~refactor (now that I've gone through and packed all the features in)~~
+test real gas prices / where to deploy this contract?
+share/refine/harden  
 look into fallback functions  
 
 better consensus functionality?  
