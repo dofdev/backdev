@@ -9,18 +9,13 @@ Design Principle(s)
 ~~refactor to Monolith~~
 ~~setup truffle~~
 ~~test buyRelease function~~
-look into fallback functions
-
-newFeatures = [ networking ]
-foreach (feature in newFeatures) {
-  psuedo code(feature) // data and systems
-  translate to solidity syntax
-  test with truffle
-}
-
 refactor (now that I've gone through and packed all the features in)
-
 share/test/refine/harden
+look into fallback functions
+add dev to project?
+new project requires consensus?
+
+
 
 
 
