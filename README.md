@@ -10,7 +10,10 @@
 ~~setup truffle~~  
 ~~test buyRelease function~~  
 ~~refactor (now that I've gone through and packed all the features in)~~
-test real gas prices / where to deploy this contract?
+~~test real gas prices / where to deploy this contract?~~
+~~cap credits on new project~~
+~~drop credit if single perm dev is a soft-lock~~
+front-end!
 share/refine/harden  
 look into fallback functions  
 

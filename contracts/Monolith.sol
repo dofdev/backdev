@@ -6,12 +6,14 @@ contract Monolith {
   mapping(address => uint) public credits;
   uint public creditCap;
 
-  constructor(address[] memory founders, uint initCreditCap) {
+  constructor(uint initCreditCap, address[] memory coFounders) {
     creditCap = initCreditCap;
-    for (uint i = 0; i < founders.length; i++)
+    devs.push(msg.sender);
+    credits[msg.sender] = creditCap;
+    for (uint i = 0; i < coFounders.length; i++)
     {
-      devs.push(founders[i]);
-      credits[founders[i]] = creditCap;
+      devs.push(coFounders[i]);
+      credits[coFounders[i]] = creditCap;
     }
   }
 
@@ -40,6 +42,15 @@ contract Monolith {
 
   function dropCredit() public {
     permission(); // then only a permDev can do this
+    uint numberOfPermDevs = 0;
+    for (uint i = 0; i < devs.length; i++)
+    {
+      if (credits[devs[i]] >= creditCap)
+      {
+        numberOfPermDevs++;
+      }
+    }
+    require(numberOfPermDevs > 1, 'NO! you are our only hope!');
     credits[msg.sender]--;
   }
 
@@ -121,7 +132,10 @@ contract Monolith {
     
     for (uint i = 0; i < initDevs.length; i++)
     {
-      credits[devs[initDevs[i]]]++;
+      if (credits[devs[initDevs[i]]] < creditCap)
+      {
+        credits[devs[initDevs[i]]]++;
+      }
       collection[devs[initDevs[i]]].push(projects.length - 1);
     }
   }
@@ -195,6 +209,4 @@ contract Monolith {
     col[colIndex] = col[col.length - 1];
     col.pop();
   }
-
-  // how to handle someone going rogue? / lost or compromised account?
 }

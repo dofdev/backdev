@@ -70,6 +70,19 @@ contract('Monolith test', async (accounts) => {
     // const contract = BigInt(await monolith.getContractBalance())
     // assert(contract > held, 'business balance is not less than contract balance')
     // console.log("this got logged")
+
+
+    // test real gas prices / where to deploy this contract?
+    // gas price scales with time
+    // 2 GWEI will usually get you within the next few minutes.
+    // so gas shouldn't be too bad, just slow, and eth 2 is coming
+    // and merging with the mainnet
+
+    // what do we want to get out of cheapETH?
+    // quick and dirty run of deploying a smart contract
+    // so you can run into any problems then instead of on the eth chain...
+
+    // front end...
   })
 })
 
