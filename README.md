@@ -13,11 +13,14 @@
 ~~test real gas prices / where to deploy this contract?~~
 ~~cap credits on new project~~
 ~~drop credit if single perm dev is a soft-lock~~
-front-end!
-share/refine/harden  
+consensus systems... made progress but don't have the right functionality for returning a consensus status
+front-end! (run on fleek) -> rustlang using wasm-pack?
+share/refine/harden
 look into fallback functions  
 
 better consensus functionality?  
+the limiting factor for consensus is for every creditCap dev to be active
+so we need some system for removing the inactive ones
 add dev to project (require consensus)?  
 new project requires consensus?  
 how to undo damage? migration?

@@ -10,9 +10,12 @@ contract('Monolith test', async (accounts) => {
     // const b = (await monolith.getProjectsLength()).toNumber()
     
     await monolith.newDev(accounts[2], { from: accounts[0] })
-    const newDev = (await monolith.devIndex(accounts[2], { from: accounts[0] })).toNumber()
-    const devs = [0, 1, newDev]
-    await monolith.newProject('test', 1500 * 1e12, devs, ['fweq98wef98ufweu8p9o'], { from: accounts[0] })
+    await monolith.newDev(accounts[2], { from: accounts[1] })
+    const newDevIndex = await monolith.devIndex(accounts[2], { from: accounts[0] })
+    assert(newDevIndex == 2, 'dev is wrong index: ' + newDevIndex)
+    // const newDev = (await monolith.devIndex(accounts[2], { from: accounts[0] })).toNumber()
+    // const devs = [0, 1, newDev]
+    // await monolith.newProject('test', 1500 * 1e12, devs, ['fweq98wef98ufweu8p9o'], { from: accounts[0] })
 
     // const a = (await monolith.getProjectsLength()).toNumber()
     // assert(a > b, 'projects did not increment')
@@ -27,14 +30,14 @@ contract('Monolith test', async (accounts) => {
     // assert(collectionLength > 0, 'collection')
 
     // Purchase
-    await monolith.buyProject(0, { from: accounts[6], value: 15000000 * 1e12 })
+    // await monolith.buyProject(0, { from: accounts[6], value: 15000000 * 1e12 })
     // await monolith.buyProject(0, { from: accounts[7], value: 15000000 * 1e12 })
     // await monolith.buyProject(0, { from: accounts[8], value: 15000000 * 1e12 })
 
 
-    await monolith.submitExpense("because i want money", BigInt(500000 * 1e12), { from: accounts[1] })
-    await monolith.signExpense(accounts[1], { from: accounts[0] })
-    await monolith.checkExpense({ from: accounts[1] })
+    // await monolith.submitExpense("because i want money", BigInt(500000 * 1e12), { from: accounts[1] })
+    // await monolith.signExpense(accounts[1], { from: accounts[0] })
+    // await monolith.checkExpense({ from: accounts[1] })
     // console.log(sent);
     
     // balance = await monolith.getBalance.call(accounts[])

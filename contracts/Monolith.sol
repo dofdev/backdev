@@ -21,6 +21,7 @@ contract Monolith {
     string reason;
     uint amount;
     uint[] signed;
+
   }
   mapping(address => Expense) public expenses;
 
@@ -74,6 +75,29 @@ contract Monolith {
     expenses[dev].signed.push(devIndex(msg.sender));
   }
 
+  function admins() internal view returns(uint[] memory) {
+    uint cnt = 0;
+    for (uint i = 0; i < devs.length; i++)
+    {
+      if (credits[devs[i]] >= creditCap)
+      {
+        cnt++;   
+      }
+    }
+    uint[] memory d = new uint[](cnt);
+    
+    uint index = 0;
+    for (uint i = 0; i < devs.length; i++)
+    {
+      if (credits[devs[i]] >= creditCap)
+      {
+        d[index++] = i;
+      }
+    }
+
+    return d;
+  }
+
   function checkExpense() public {
     permission();
     
@@ -97,18 +121,33 @@ contract Monolith {
     payable(msg.sender).transfer(expenses[msg.sender].amount);
   }
 
+  function readExpense() public {
+    permission();
+
+
+  }
+
   function getContractBalance() public view returns (uint) { // test
     permission();
     return payable(address(this)).balance;
   }
 
-  function newDev(address dev) public {
+  mapping(address => address) private newDevConsensus;
+  function newDev(address dev) public returns(string memory) {
     permission();
+    newDevConsensus[msg.sender] = dev; // test if this was stored
+    uint[] memory a = admins();
+    for (uint i = 0; i < a.length; i++)
+    {
+      if (newDevConsensus[devs[i]] != dev) { return 'consensus not reached yet'; }
+    }
+
     for (uint i = 0; i < devs.length; i++)
     {
-      require(devs[i] != dev, "dev already exists");
+      if (devs[i] == dev) { return 'dev already exists'; }
     }
     devs.push(dev);
+    return 'new dev!';
   }
 
   function devIndex(address dev) public view returns (uint) {
@@ -140,7 +179,7 @@ contract Monolith {
     }
   }
 
-  function pushHash(uint projectIndex, string calldata hash) public {
+  function pushHash(uint projectIndex, string memory hash) public {
     permission();
     projects[projectIndex].hashes.push(hash);
   }
