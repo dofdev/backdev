@@ -13,8 +13,10 @@
 ~~test real gas prices / where to deploy this contract?~~
 ~~cap credits on new project~~
 ~~drop credit if single perm dev is a soft-lock~~
-consensus systems... made progress but don't have the right functionality for returning a consensus status
-front-end! (run on fleek) -> rustlang using wasm-pack?
+~~deploy and connect our contract to the unity nethereum front end using ganache~~
+~~consensus systems... made progress but don't have the right functionality for returning a consensus status~~
+propogate the new consensus system
+front-end!
 share/refine/harden
 look into fallback functions  
 
@@ -32,5 +34,6 @@ truffle migrate
 truffle test  
 
 ## faq  
+truffle test -> update the nethereum contract address
 constructor parameters are in migrations/2_deploy_contracts.js 
 uint == uint256  
